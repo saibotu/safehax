@@ -156,7 +156,7 @@ exit:
 		gfxSetScreenFormat(GFX_TOP, GSP_BGR8_OES);
 		gfxSetFramebufferInfo(GFX_TOP, 0);
 		gfxFlushBuffers();
-		gfxSwapBuffers();
+		gfxConfigScreen(GFX_TOP, true);
 		gspWaitForVBlank();
 	}
 	
