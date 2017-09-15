@@ -74,10 +74,18 @@ int main(int argc, char **argv){
 	aptInit();
 	sdmcInit();
 	romfsInit();
-	
+	amInit();
+
 	kver = osGetKernelVersion();
-	if (kver > SYSTEM_VERSION(2, 53, 0)) //11.4^
-		PANIC(true, "UNSUPPORTED FIRMWARE!");
+
+	bool isNew3DS;
+	APT_CheckNew3DS(&isNew3DS);
+
+	u64 titleID = isNew3DS ? 0x0004013820000002 : 0x0004013800000002;
+	AM_TitleEntry entry;
+	PANIC(!R_SUCCEEDED(AM_GetTitleInfo(MEDIATYPE_NAND, 1, &titleID, &entry)), "FAILED TO GET NATIVE_FIRM TITLE");
+
+	PANIC(entry.version > 27476, "UNSUPPORTED FIRMWARE!"); // 11.4^
 	
 	if (checkSvcGlobalBackdoor()){
 		initsrv_allservices();
@@ -160,6 +168,7 @@ exit:
 		gspWaitForVBlank();
 	}
 	
+	amExit();
 	pmExit();
 	romfsExit();
 	sdmcExit();
